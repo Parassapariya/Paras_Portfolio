@@ -1,0 +1,161 @@
+import React, { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Code2, Github, Globe, User } from "lucide-react"
+import AOS from "aos"
+import "aos/dist/aos.css"
+
+/* ================= TYPEWRITER ================= */
+
+const TypewriterEffect = ({ text }) => {
+  const [displayText, setDisplayText] = useState("")
+
+  useEffect(() => {
+    let index = 0
+    const timer = setInterval(() => {
+      if (index <= text.length) {
+        setDisplayText(text.slice(0, index))
+        index++
+      } else {
+        clearInterval(timer)
+      }
+    }, 120)
+
+    return () => clearInterval(timer)
+  }, [text])
+
+  return (
+    <span>
+      {displayText}
+      <span className="animate-pulse">|</span>
+    </span>
+  )
+}
+
+/* ================= BACKGROUND ================= */
+
+const BackgroundEffect = () => (
+  <div className="absolute inset-0 overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 blur-3xl animate-pulse" />
+    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-600/10 via-transparent to-purple-600/10 blur-2xl animate-float" />
+  </div>
+)
+
+/* ================= ICON ================= */
+
+const IconButton = ({ Icon }) => (
+  <div className="relative group hover:scale-110 transition-transform duration-300">
+    <div className="absolute -inset-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full blur opacity-30 group-hover:opacity-75 transition" />
+    <div className="relative p-2 sm:p-3 bg-black/50 backdrop-blur-sm rounded-full border border-white/10">
+      <Icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-white" />
+    </div>
+  </div>
+)
+
+/* ================= MAIN SCREEN ================= */
+
+const WelcomeScreen = ({ onLoadingComplete }) => {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      easing: "ease-in-out",
+    })
+
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+      setTimeout(() => onLoadingComplete?.(), 800)
+    }, 4000)
+
+    return () => clearTimeout(timer)
+  }, [onLoadingComplete])
+
+  const containerVariants = {
+    exit: {
+      opacity: 0,
+      scale: 1.1,
+      filter: "blur(10px)",
+      transition: { duration: 0.8, ease: "easeInOut" },
+    },
+  }
+
+  return (
+    <AnimatePresence>
+      {isLoading && (
+        <motion.div
+          className="fixed inset-0 bg-[#030014] z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit="exit"
+          variants={containerVariants}
+        >
+          <BackgroundEffect />
+
+          <div className="relative min-h-screen flex items-center justify-center px-4">
+            <div className="w-full max-w-4xl mx-auto text-center">
+
+              {/* ICONS */}
+              <div className="flex justify-center gap-4 sm:gap-6 md:gap-10 mb-8">
+                {[Code2, User, Github].map((Icon, index) => (
+                  <div key={index} data-aos="fade-down" data-aos-delay={index * 200}>
+                    <IconButton Icon={Icon} />
+                  </div>
+                ))}
+              </div>
+
+              {/* TITLE */}
+              <div className="mb-8">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight">
+                  <div className="mb-2">
+                    <span className="bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
+                      Welcome to My
+                    </span>
+                  </div>
+                  <div>
+                    <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      Professional Portfolio
+                    </span>
+                  </div>
+                </h1>
+              </div>
+
+              {/* SUB TEXT */}
+              <p
+                className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-6"
+                data-aos="fade-up"
+                data-aos-delay="600"
+              >
+                Showcasing my skills, projects, and experience in modern web development and digital technologies.
+              </p>
+
+              {/* PORTFOLIO LINK */}
+              <div data-aos="fade-up" data-aos-delay="800">
+                <a
+                  href="https://www.eki.my.id"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex flex-col items-center gap-2 px-6 py-4 rounded-full relative group hover:scale-105 transition-transform"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 rounded-full blur-md group-hover:blur-lg transition" />
+
+                  {/* <span className="relative text-xs sm:text-sm text-gray-400 tracking-wide">
+                    Explore My Professional Portfolio
+                  </span>
+
+                  <span className="relative text-lg sm:text-xl md:text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
+                    <Globe className="w-5 h-5" />
+                    <TypewriterEffect text="" />
+                  </span> */}
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+export default WelcomeScreen
